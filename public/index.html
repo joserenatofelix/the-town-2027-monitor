@@ -13,13 +13,13 @@
       <header class="topbar">
         <a class="brand" href="/" aria-label="Monitor The Town">
           <span class="brand-mark">T</span>
-          <span>THE TOWN <small>MONITOR LOCAL</small></span>
+          <span>THE TOWN <small>CONSULTA DO SITE</small></span>
         </a>
         <div class="local-clock" aria-label="Data e hora locais">
           <time id="current-clock">--:--:--</time>
           <span id="current-date">--/--/----</span>
         </div>
-        <span class="local-indicator"><i></i> EXECUTANDO NESTE COMPUTADOR</span>
+        <span class="local-indicator"><i></i> CONSULTA SOB DEMANDA</span>
       </header>
 
       <section class="event-banner" aria-label="The Town São Paulo">
@@ -60,7 +60,7 @@
           </div>
           <div class="status-meta">
             <div><span>ÚLTIMA CONSULTA</span><strong id="last-check">Ainda não consultada</strong></div>
-            <div><span>INTERVALO AUTOMÁTICO</span><strong id="interval">A cada 30 minutos</strong></div>
+            <div><span>MODO DE CONSULTA</span><strong id="interval">Sob demanda</strong></div>
           </div>
         </div>
 
@@ -69,7 +69,6 @@
             <h3>O que está sendo acompanhado</h3>
             <p class="target-date">SÁBADO, 4 DE SETEMBRO DE 2027</p>
             <p>Slipknot + Marilyn Manson <span>·</span> Palco Skyline</p>
-            <p id="ticket-summary">2 ingressos <span>·</span> meia-entrada, se ambos elegíveis</p>
           </section>
           <section class="detail-block">
             <h3>Sinais encontrados na página</h3>
@@ -77,67 +76,13 @@
           </section>
         </div>
 
-        <section class="preferences" aria-labelledby="preferences-title">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">SUAS PREFERÊNCIAS</p>
-              <h2 id="preferences-title">Ingressos e alertas</h2>
-            </div>
-            <span class="local-only">SALVO SOMENTE NESTE COMPUTADOR</span>
-          </div>
-
-          <form id="preferences-form">
-            <div class="ticket-controls">
-              <label class="field quantity-field" for="quantity">
-                <span>Quantidade</span>
-                <input id="quantity" name="quantidade" type="number" min="1" max="10" value="2" required />
-              </label>
-              <fieldset class="ticket-type">
-                <legend>Tipo de ingresso</legend>
-                <div class="segmented-control">
-                  <label><input type="radio" name="tipoIngresso" value="meia" checked /><span>Meia-entrada</span></label>
-                  <label><input type="radio" name="tipoIngresso" value="inteira" /><span>Inteira</span></label>
-                </div>
-              </fieldset>
-            </div>
-
-            <p class="eligibility-note">Meia-entrada: confirme a elegibilidade de cada beneficiário. O limite é de uma por CPF por dia, salvo a exceção oficial para pessoa com deficiência e acompanhante.</p>
-
-            <div class="channel-grid">
-              <fieldset class="channel-fieldset">
-                <legend><label class="channel-toggle"><input id="notify-email" name="avisarEmail" type="checkbox" /><span>E-mail</span></label></legend>
-                <label class="field" for="email-address">
-                  <span>Endereço para receber o alerta</span>
-                  <input id="email-address" name="email" type="email" placeholder="voce@exemplo.com" autocomplete="email" />
-                </label>
-                <p id="email-readiness" class="channel-readiness">SMTP não configurado</p>
-              </fieldset>
-
-              <fieldset class="channel-fieldset">
-                <legend><label class="channel-toggle"><input id="notify-whatsapp" name="avisarWhatsapp" type="checkbox" /><span>WhatsApp</span></label></legend>
-                <label class="field" for="whatsapp-number">
-                  <span>Número com código do país e DDD</span>
-                  <input id="whatsapp-number" name="whatsapp" type="tel" placeholder="+55 11 99999-9999" autocomplete="tel" />
-                </label>
-                <p id="whatsapp-readiness" class="channel-readiness">WhatsApp Cloud API não configurada</p>
-              </fieldset>
-            </div>
-
-            <div class="form-actions">
-              <p id="preferences-message" class="form-message" role="status" aria-live="polite">Os dados de contato ficam em um arquivo local ignorado pelo Git.</p>
-              <button class="save-button" type="submit">Salvar preferências</button>
-            </div>
-          </form>
+        <section class="detail-block">
+          <h3>Consulta sob demanda</h3>
+          <p>Use “Verificar agora” para consultar novamente a página oficial. Este painel não salva preferências ou histórico e não envia alertas por e-mail ou WhatsApp.</p>
         </section>
 
-        <div id="change-notice" class="change-notice" hidden>
-          <span class="notice-icon">!</span>
-          <p><strong>O conteúdo mudou.</strong> Isso não confirma venda ou disponibilidade. Confira a página oficial.</p>
-          <a id="official-link" href="https://thetown.com.br/pt/" target="_blank" rel="noreferrer">Abrir site <span aria-hidden="true">↗</span></a>
-        </div>
-
         <footer class="dashboard-footer">
-          <p>Uma alteração pode ser apenas editorial. A consulta não verifica estoque nem elegibilidade.</p>
+          <p>A consulta lê o HTML da página oficial e pode não capturar conteúdo carregado por JavaScript. Não verifica estoque nem elegibilidade.</p>
           <a href="https://thetown.com.br/pt/" target="_blank" rel="noreferrer">thetown.com.br <span aria-hidden="true">↗</span></a>
         </footer>
         <p class="site-credit">Desenvolvido por José Renato Felix</p>

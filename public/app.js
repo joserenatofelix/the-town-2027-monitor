@@ -1,7 +1,8 @@
 const statusLabels = {
   waiting: "Aguardando consulta",
   checking: "Verificando página",
-  unchanged: "Monitor ativo",
+  checked: "Consulta concluída",
+  unchanged: "Consulta concluída",
   changed: "Alteração detectada",
   error: "Falha na consulta",
 };
@@ -14,19 +15,7 @@ const elements = {
   lastCheck: document.querySelector("#last-check"),
   interval: document.querySelector("#interval"),
   keywords: document.querySelector("#keywords"),
-  notice: document.querySelector("#change-notice"),
   toast: document.querySelector("#toast"),
-  form: document.querySelector("#preferences-form"),
-  quantity: document.querySelector("#quantity"),
-  ticketSummary: document.querySelector("#ticket-summary"),
-  emailEnabled: document.querySelector("#notify-email"),
-  email: document.querySelector("#email-address"),
-  emailReadiness: document.querySelector("#email-readiness"),
-  whatsappEnabled: document.querySelector("#notify-whatsapp"),
-  whatsapp: document.querySelector("#whatsapp-number"),
-  whatsappReadiness: document.querySelector("#whatsapp-readiness"),
-  preferencesMessage: document.querySelector("#preferences-message"),
-  saveButton: document.querySelector(".save-button"),
   ticketAlert: document.querySelector("#ticket-alert"),
   ticketAlertMessage: document.querySelector("#ticket-alert-message"),
   ticketAlertDetail: document.querySelector("#ticket-alert-detail"),
@@ -64,57 +53,19 @@ function atualizarRelogio() {
   }).format(agora);
 }
 
-function atualizarResumoIngresso() {
-  const quantidade = Number(elements.quantity.value) || 1;
-  const tipo = elements.form.querySelector('input[name="tipoIngresso"]:checked')?.value ?? "meia";
-  elements.ticketSummary.textContent = `${quantidade} ${quantidade === 1 ? "ingresso" : "ingressos"} · ${tipo === "meia" ? "meia-entrada, se elegível" : "inteira"}`;
-}
-
-function atualizarCanais(canais) {
-  const emailPronto = canais?.email === true;
-  const whatsappPronto = canais?.whatsapp === true;
-  elements.emailReadiness.textContent = emailPronto ? "SMTP configurado" : "SMTP pendente: configure no arquivo .env";
-  elements.emailReadiness.className = `channel-readiness ${emailPronto ? "is-ready" : "is-pending"}`;
-  elements.whatsappReadiness.textContent = whatsappPronto ? "WhatsApp Cloud API configurada" : "Pendente: token, número e modelo da Meta no .env";
-  elements.whatsappReadiness.className = `channel-readiness ${whatsappPronto ? "is-ready" : "is-pending"}`;
-}
-
-async function carregarPreferencias() {
-  try {
-    const resposta = await fetch("/api/settings", { cache: "no-store" });
-    if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
-    const dados = await resposta.json();
-    const preferencias = dados.preferencias;
-    elements.quantity.value = preferencias.quantidade;
-    elements.form.querySelector(`input[name="tipoIngresso"][value="${preferencias.tipoIngresso}"]`).checked = true;
-    elements.email.value = preferencias.email;
-    elements.whatsapp.value = preferencias.whatsapp;
-    elements.emailEnabled.checked = preferencias.avisarEmail;
-    elements.whatsappEnabled.checked = preferencias.avisarWhatsapp;
-    elements.email.required = elements.emailEnabled.checked;
-    elements.whatsapp.required = elements.whatsappEnabled.checked;
-    atualizarCanais(dados.canaisConfigurados);
-    atualizarResumoIngresso();
-  } catch {
-    elements.preferencesMessage.textContent = "Não foi possível carregar as preferências locais.";
-    elements.preferencesMessage.className = "form-message is-error";
-  }
-}
-
 function desenharStatus(status) {
   elements.label.textContent = statusLabels[status.fase] ?? "Status desconhecido";
   elements.message.textContent = status.mensagem;
   elements.lastCheck.textContent = formatarData(status.ultimaConsulta);
-  elements.interval.textContent = `A cada ${status.intervaloMinutos ?? 30} minutos`;
-  elements.dot.className = `status-dot ${status.fase === "checking" ? "is-checking" : ""} ${status.fase === "unchanged" ? "is-good" : ""} ${status.fase === "changed" ? "is-changed" : ""} ${status.fase === "error" ? "is-error" : ""}`;
+  elements.interval.textContent = "Sob demanda";
+  elements.dot.className = `status-dot ${status.fase === "checking" ? "is-checking" : ""} ${["checked", "unchanged"].includes(status.fase) ? "is-good" : ""} ${status.fase === "changed" ? "is-changed" : ""} ${status.fase === "error" ? "is-error" : ""}`;
   elements.button.disabled = status.fase === "checking";
   elements.button.querySelector("span").textContent = status.fase === "checking" ? "Consultando..." : "Verificar agora";
-  elements.notice.hidden = status.fase !== "changed";
 
   const situacao = status.situacaoIngressos ?? "nao-confirmado";
   elements.ticketAlert.className = `ticket-alert ${situacao === "disponivel" ? "is-available" : situacao === "indisponivel" ? "is-unavailable" : "is-unknown"}`;
   if (situacao === "disponivel") {
-    elements.ticketAlertMessage.textContent = "Ingressos à venda!";
+    elements.ticketAlertMessage.textContent = "Possível sinal de venda";
     elements.ticketAlertDetail.textContent = "Sinal encontrado no texto; confirme no site oficial";
   } else if (situacao === "indisponivel") {
     elements.ticketAlertMessage.textContent = "Ingressos indisponíveis para venda!";
@@ -139,87 +90,32 @@ function desenharStatus(status) {
   }
 }
 
-async function carregarStatus() {
+async function carregarStatus(manual = false) {
+  elements.button.disabled = true;
+  elements.button.querySelector("span").textContent = "Consultando...";
+  elements.label.textContent = "Verificando página";
+  elements.message.textContent = "Consultando a página oficial...";
+  elements.dot.className = "status-dot is-checking";
   try {
-    const resposta = await fetch("/api/status", { cache: "no-store" });
-    if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
-    desenharStatus(await resposta.json());
+    const resposta = await fetch(manual ? "/api/check" : "/api/status", {
+      method: manual ? "POST" : "GET",
+      cache: "no-store",
+    });
+    const status = await resposta.json();
+    if (!resposta.ok && status.fase !== "error") throw new Error("Falha na API");
+    desenharStatus(status);
+    if (manual) mostrarToast(status.fase === "error" ? status.mensagem : "Verificação concluída.");
   } catch {
     elements.label.textContent = "Monitor indisponível";
-    elements.message.textContent = "Confira se o processo npm start continua ativo.";
+    elements.message.textContent = "Não foi possível consultar a API. Tente novamente em instantes.";
     elements.dot.className = "status-dot is-error";
+  } finally {
+    elements.button.disabled = false;
+    elements.button.querySelector("span").textContent = "Verificar agora";
   }
 }
 
-elements.button.addEventListener("click", async () => {
-  elements.button.disabled = true;
-  elements.button.querySelector("span").textContent = "Consultando...";
-  try {
-    const resposta = await fetch("/api/check", { method: "POST" });
-    if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
-    const status = await resposta.json();
-    desenharStatus(status);
-    mostrarToast(status.fase === "changed" ? "Mudança detectada. Confira o site oficial." : "Verificação concluída.");
-  } catch (erro) {
-    mostrarToast(`Não foi possível verificar: ${erro.message}`);
-    await carregarStatus();
-  }
-});
-
-elements.quantity.addEventListener("input", atualizarResumoIngresso);
-elements.form.querySelectorAll('input[name="tipoIngresso"]').forEach((opcao) => {
-  opcao.addEventListener("change", atualizarResumoIngresso);
-});
-elements.emailEnabled.addEventListener("change", () => {
-  elements.email.required = elements.emailEnabled.checked;
-});
-elements.whatsappEnabled.addEventListener("change", () => {
-  elements.whatsapp.required = elements.whatsappEnabled.checked;
-});
-
-elements.form.addEventListener("submit", async (evento) => {
-  evento.preventDefault();
-  elements.saveButton.disabled = true;
-  elements.preferencesMessage.textContent = "Salvando preferências...";
-  elements.preferencesMessage.className = "form-message";
-
-  const preferencias = {
-    quantidade: Number(elements.quantity.value),
-    tipoIngresso: elements.form.querySelector('input[name="tipoIngresso"]:checked').value,
-    email: elements.email.value,
-    whatsapp: elements.whatsapp.value,
-    avisarEmail: elements.emailEnabled.checked,
-    avisarWhatsapp: elements.whatsappEnabled.checked,
-  };
-
-  try {
-    const resposta = await fetch("/api/settings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(preferencias),
-    });
-    const resultado = await resposta.json();
-    if (!resposta.ok) throw new Error(resultado.erro ?? `HTTP ${resposta.status}`);
-
-    atualizarCanais(resultado.canaisConfigurados);
-    const pendencias = [];
-    if (preferencias.avisarEmail && !resultado.canaisConfigurados.email) pendencias.push("SMTP");
-    if (preferencias.avisarWhatsapp && !resultado.canaisConfigurados.whatsapp) pendencias.push("WhatsApp Cloud API");
-    elements.preferencesMessage.textContent = pendencias.length
-      ? `Preferências salvas localmente. Configure ${pendencias.join(" e ")} no .env para habilitar os envios.`
-      : "Preferências salvas neste computador.";
-    elements.preferencesMessage.className = `form-message ${pendencias.length ? "is-pending" : "is-success"}`;
-    atualizarResumoIngresso();
-  } catch (erro) {
-    elements.preferencesMessage.textContent = erro.message;
-    elements.preferencesMessage.className = "form-message is-error";
-  } finally {
-    elements.saveButton.disabled = false;
-  }
-});
-
+elements.button.addEventListener("click", () => { void carregarStatus(true); });
 atualizarRelogio();
 setInterval(atualizarRelogio, 1000);
-void carregarPreferencias();
 void carregarStatus();
-setInterval(carregarStatus, 4000);

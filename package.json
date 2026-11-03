@@ -9,6 +9,7 @@
     "start": "npm run build && node dist/index.js"
   },
   "dependencies": {
+    "@netlify/functions": "^6.0.3",
     "dotenv": "^16.6.1",
     "node-notifier": "^10.0.1",
     "nodemailer": "^10.0.12",
