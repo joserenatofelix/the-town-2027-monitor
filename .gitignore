@@ -1,0 +1,7 @@
+node_modules/
+dist/
+estado.json
+estado.json.tmp
+preferencias.json
+preferencias.json.tmp
+.env

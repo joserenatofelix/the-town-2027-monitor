@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#141718" />
+    <title>Monitor The Town 2027</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Monitor The Town">
+          <span class="brand-mark">T</span>
+          <span>THE TOWN <small>MONITOR LOCAL</small></span>
+        </a>
+        <div class="local-clock" aria-label="Data e hora locais">
+          <time id="current-clock">--:--:--</time>
+          <span id="current-date">--/--/----</span>
+        </div>
+        <span class="local-indicator"><i></i> EXECUTANDO NESTE COMPUTADOR</span>
+      </header>
+
+      <section class="event-banner" aria-label="The Town São Paulo">
+        <div class="banner-shade"></div>
+        <div class="banner-copy">
+          <p class="eyebrow">SÃO PAULO · 2027</p>
+          <h1>Acompanhe. <em>Sem perder o sinal.</em></h1>
+        </div>
+        <aside id="ticket-alert" class="ticket-alert is-unknown" aria-live="polite">
+          <span class="ticket-alert-icon" aria-hidden="true">!</span>
+          <span class="ticket-alert-copy">
+            <span class="ticket-alert-heading">ATENÇÃO</span>
+            <strong id="ticket-alert-message">Disponibilidade não confirmada</strong>
+            <small id="ticket-alert-detail">Aguardando sinal explícito na página oficial</small>
+          </span>
+        </aside>
+      </section>
+
+      <section class="dashboard" aria-labelledby="dashboard-title">
+        <div class="dashboard-heading">
+          <div>
+            <p class="eyebrow">CENTRAL DE MONITORAMENTO</p>
+            <h2 id="dashboard-title">Página oficial de ingressos</h2>
+          </div>
+          <button id="check-button" class="check-button" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4.9 9a7.5 7.5 0 0 1 12.4-2.8L20 9M4 17v-5h5m10.1 3a7.5 7.5 0 0 1-12.4 2.8L4 15" /></svg>
+            <span>Verificar agora</span>
+          </button>
+        </div>
+
+        <div class="status-panel" aria-live="polite">
+          <div class="status-main">
+            <span id="status-dot" class="status-dot"></span>
+            <div>
+              <p id="status-label" class="status-label">Conectando ao monitor</p>
+              <p id="status-message" class="status-message">Carregando o status da consulta...</p>
+            </div>
+          </div>
+          <div class="status-meta">
+            <div><span>ÚLTIMA CONSULTA</span><strong id="last-check">Ainda não consultada</strong></div>
+            <div><span>INTERVALO AUTOMÁTICO</span><strong id="interval">A cada 30 minutos</strong></div>
+          </div>
+        </div>
+
+        <div class="details-grid">
+          <section class="detail-block">
+            <h3>O que está sendo acompanhado</h3>
+            <p class="target-date">SÁBADO, 4 DE SETEMBRO DE 2027</p>
+            <p>Slipknot + Marilyn Manson <span>·</span> Palco Skyline</p>
+            <p id="ticket-summary">2 ingressos <span>·</span> meia-entrada, se ambos elegíveis</p>
+          </section>
+          <section class="detail-block">
+            <h3>Sinais encontrados na página</h3>
+            <div id="keywords" class="keyword-list"><span class="muted">Aguardando consulta</span></div>
+          </section>
+        </div>
+
+        <section class="preferences" aria-labelledby="preferences-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">SUAS PREFERÊNCIAS</p>
+              <h2 id="preferences-title">Ingressos e alertas</h2>
+            </div>
+            <span class="local-only">SALVO SOMENTE NESTE COMPUTADOR</span>
+          </div>
+
+          <form id="preferences-form">
+            <div class="ticket-controls">
+              <label class="field quantity-field" for="quantity">
+                <span>Quantidade</span>
+                <input id="quantity" name="quantidade" type="number" min="1" max="10" value="2" required />
+              </label>
+              <fieldset class="ticket-type">
+                <legend>Tipo de ingresso</legend>
+                <div class="segmented-control">
+                  <label><input type="radio" name="tipoIngresso" value="meia" checked /><span>Meia-entrada</span></label>
+                  <label><input type="radio" name="tipoIngresso" value="inteira" /><span>Inteira</span></label>
+                </div>
+              </fieldset>
+            </div>
+
+            <p class="eligibility-note">Meia-entrada: confirme a elegibilidade de cada beneficiário. O limite é de uma por CPF por dia, salvo a exceção oficial para pessoa com deficiência e acompanhante.</p>
+
+            <div class="channel-grid">
+              <fieldset class="channel-fieldset">
+                <legend><label class="channel-toggle"><input id="notify-email" name="avisarEmail" type="checkbox" /><span>E-mail</span></label></legend>
+                <label class="field" for="email-address">
+                  <span>Endereço para receber o alerta</span>
+                  <input id="email-address" name="email" type="email" placeholder="voce@exemplo.com" autocomplete="email" />
+                </label>
+                <p id="email-readiness" class="channel-readiness">SMTP não configurado</p>
+              </fieldset>
+
+              <fieldset class="channel-fieldset">
+                <legend><label class="channel-toggle"><input id="notify-whatsapp" name="avisarWhatsapp" type="checkbox" /><span>WhatsApp</span></label></legend>
+                <label class="field" for="whatsapp-number">
+                  <span>Número com código do país e DDD</span>
+                  <input id="whatsapp-number" name="whatsapp" type="tel" placeholder="+55 11 99999-9999" autocomplete="tel" />
+                </label>
+                <p id="whatsapp-readiness" class="channel-readiness">WhatsApp Cloud API não configurada</p>
+              </fieldset>
+            </div>
+
+            <div class="form-actions">
+              <p id="preferences-message" class="form-message" role="status" aria-live="polite">Os dados de contato ficam em um arquivo local ignorado pelo Git.</p>
+              <button class="save-button" type="submit">Salvar preferências</button>
+            </div>
+          </form>
+        </section>
+
+        <div id="change-notice" class="change-notice" hidden>
+          <span class="notice-icon">!</span>
+          <p><strong>O conteúdo mudou.</strong> Isso não confirma venda ou disponibilidade. Confira a página oficial.</p>
+          <a id="official-link" href="https://thetown.com.br/pt/" target="_blank" rel="noreferrer">Abrir site <span aria-hidden="true">↗</span></a>
+        </div>
+
+        <footer class="dashboard-footer">
+          <p>Uma alteração pode ser apenas editorial. A consulta não verifica estoque nem elegibilidade.</p>
+          <a href="https://thetown.com.br/pt/" target="_blank" rel="noreferrer">thetown.com.br <span aria-hidden="true">↗</span></a>
+        </footer>
+        <p class="site-credit">Desenvolvido por José Renato Felix</p>
+      </section>
+    </main>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "name": "the-town-2027-monitor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Monitor local de alterações na página oficial do The Town 2027.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "npm run build && node dist/index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "node-notifier": "^10.0.1",
+    "nodemailer": "^10.0.12",
+    "open": "^10.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "@types/node-notifier": "^8.0.5",
+    "@types/nodemailer": "^6.4.17",
+    "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
+  }
+}
