@@ -45,3 +45,17 @@ Sem a configuração do provedor, os contatos e preferências ficam salvos, mas 
 ## Personalizar
 
 O endereço, intervalo e caminho dos arquivos de estado estão no objeto `CONFIG` em `src/index.ts`. Os indicadores de venda estão em `indicadoresVenda`; podem não acompanhar o conteúdo carregado por JavaScript e não comprovam disponibilidade.
+
+## Deploy na Netlify
+
+A versão publicada na Netlify funciona sem banco de dados. O painel faz uma consulta ao abrir e permite novas consultas pelo botão **Verificar agora**. Não salva preferências, contatos ou histórico; não compara consultas anteriores e não envia alertas por e-mail ou WhatsApp. Não há consultas agendadas em segundo plano nesta versão.
+
+Os arquivos em `public` são publicados como site estático. A função `netlify/functions/api.mts` atende `GET /api/status` e `POST /api/check`, consultando o site oficial em cada chamada. As respostas JSON usam `Cache-Control: no-store`. Uma falha na consulta externa retorna HTTP 502 com uma mensagem para o painel, em vez de indicar disponibilidade.
+
+A configuração de publicação está em `netlify.toml`. O deploy não exige provisionamento de banco nem migrações, eliminando a dependência que causava o erro `403 — database feature not available for this account`. A correção do 404 depende da publicação das Functions junto com o painel.
+
+As instruções de execução local acima descrevem o servidor original em `src/index.ts`, que pode continuar sendo executado separadamente com `npm start`. Os recursos locais de arquivos, alertas e agendamento não são executados na Netlify. O painel compartilhado agora apresenta apenas consultas sob demanda.
+
+### Validação da API
+
+Execute `node --test tests/api.test.mjs` para validar as rotas com respostas HTTP simuladas, sem consultar o site oficial ou usar armazenamento. A publicação é validada pelo fluxo de deploy da Netlify.
